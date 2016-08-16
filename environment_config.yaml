@@ -1,0 +1,21 @@
+attributes:
+  metadata:
+    group: 'other'
+  glance_nfs_server_ip:
+    value: ''
+    label: 'NFS server'
+    description: 'The hostname (or IP address) for NFS server'
+    weight: 70
+    type: "text"
+  share:
+    value: ''
+    label: 'NFS share'
+    description: 'The NFS share path (e.g. /vol1)'
+    weight: 72
+    type: "text"
+  nfs_mount_opts:
+    value: ''
+    label: 'NFS options'
+    description: 'mount options'
+    weight: 75
+    type: "text"

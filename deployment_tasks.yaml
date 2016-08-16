@@ -1,0 +1,66 @@
+# Deployment tasks
+- id: swift
+  type: skipped
+
+- id: primary-swift
+  type: skipped
+
+- id: swift-rebalance-cron
+  type: skipped
+
+- id: swift-keystone
+  type: skipped
+
+- id: openstack-haproxy-swift
+  type: skipped
+
+- id: glance
+  type: skipped
+
+- id: controller-glance-nfs
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  requires: [openstack-haproxy, primary-database, database]
+  required_for: [glance]
+  parameters:
+    puppet_manifest: puppet/manifests/controller_glance_nfs.pp
+    puppet_modules:  "puppet/modules/:/etc/puppet/modules/"
+    timeout: 3600
+  test_pre:
+    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/glance/glance_pre.rb
+  test_post:
+    cmd: ruby /etc/puppet/modules/osnailyfacter/modular/glance/glance_post.rb
+
+- id: glance_ug_create
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  requires: [deploy_start]
+  required_for: [controller-glance-nfs, glance_nfs_mount]
+  parameters:
+    puppet_manifest: puppet/manifests/glance_ug_create.pp
+    puppet_modules:  "puppet/modules/:/etc/puppet/modules/"
+    timeout: 3600
+
+- id: glance_nfs_mount
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller]
+  requires: [glance_ug_create]
+  required_for: [controller-glance-nfs]
+  parameters:
+    puppet_manifest: puppet/manifests/glance_nfs_mount.pp
+    puppet_modules:  "puppet/modules/:/etc/puppet/modules/"
+    timeout: 3600
+
+- id: nova_ug_create
+  type: puppet
+  version: 2.0.0
+  groups: [primary-controller, controller, compute]
+  requires: [deploy_start]
+  required_for: [tools]
+  parameters:
+    puppet_manifest: puppet/manifests/nova_ug_create.pp
+    puppet_modules:  "puppet/modules/:/etc/puppet/modules/"
+    timeout: 3600
